@@ -18,6 +18,9 @@
         Show {{ showPercentage ? 'Counts' : 'Percentages' }}
       </button>
       <button mat-raised-button color="primary" (click)="toggleAllCharts()">Toggle All Charts</button>
+      <button mat-raised-button color="accent" (click)="toggleAccessiblePalette()">
+        {{ useAccessiblePalette ? 'Use Standard Palette' : 'Use Accessible Palette' }}
+      </button>
     </div>
   </div>
 
