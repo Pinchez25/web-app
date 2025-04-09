@@ -1,10 +1,14 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SurveyStatisticsComponent } from './survey-statistics/survey-statistics.component';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
-import { SharedModule } from '../shared/shared.module';
+
 import { Route } from '../core/route/route.service';
+import { SharedModule } from '../shared/shared.module';
 import { ColourService } from './services/colour-service';
+import { SurveysService } from './services/surveys.service';
+import { SurveyStatisticsComponent } from './survey-statistics/survey-statistics.component';
 
 const routes: Routes = [
   Route.withShell([
@@ -24,15 +28,28 @@ const routes: Routes = [
 ];
 
 @NgModule({
+  imports: [
+    RouterModule.forChild(routes),
+    CommonModule,
+    SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule
+  ],
   declarations: [
     SurveyStatisticsComponent
   ],
-  imports: [
+  exports: [
+    RouterModule,
     CommonModule,
     SharedModule,
-    RouterModule.forChild(routes)],
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule
+  ],
   providers: [
-    ColourService
+    ColourService,
+    SurveysService
   ]
 })
 export class SurveysModule {}
