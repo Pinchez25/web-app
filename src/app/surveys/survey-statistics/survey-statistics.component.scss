@@ -7,7 +7,7 @@ $text-primary: #2c3e50;
 $text-secondary: #5d6778;
 $divider-color: #dee2e6;
 $background-color: #f8f9fa;
-$card-background: #fff;
+$card-background: #f5f7fa;
 $success-color: #28a745;
 $warning-color: #ffc107;
 $danger-color: #dc3545;
@@ -135,21 +135,13 @@ $transition: all 0.3s ease;
   .controls {
     display: flex;
     flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1rem;
     justify-content: center;
-    gap: 0.75rem;
 
     button {
-      @include button;
-
-      background-color: $primary-color;
-      color: white;
-      min-width: 150px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
-
-      &:hover {
-        background-color: $primary-dark;
-      }
+      min-width: 120px;
+      margin: 0 5px;
     }
   }
 }
