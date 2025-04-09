@@ -1,4 +1,7 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { SurveysService } from '../services/surveys.service';
 import Chart from 'chart.js';
 import { ColourService } from '../services/colour-service';
 
@@ -7,86 +10,16 @@ import { ColourService } from '../services/colour-service';
   templateUrl: './survey-statistics.component.html',
   styleUrls: ['./survey-statistics.component.scss']
 })
-export class SurveyStatisticsComponent implements AfterViewInit {
+export class SurveyStatisticsComponent implements OnInit {
+  surveys: any[] = [];
+  selectedSurveyId: number = 0;
+  isLoading: boolean = true;
+  errorMessage: string = '';
+
   surveyData: any = {
-    surveyName: 'Climate Change',
-    totalResponses: 2,
-    questions: [
-      {
-        questionCode: '1',
-        questionText: 'How concerned are you about climate change?',
-        choices: [
-          { choiceText: 'Not at all concerned', count: 1, percentage: 14.29 },
-          { choiceText: 'Slightly concerned', count: 3, percentage: 42.86 },
-          { choiceText: 'Moderately concerned', count: 0, percentage: 0 },
-          { choiceText: 'Very Concerned', count: 1, percentage: 14.29 },
-          { choiceText: 'Extremely Concerned', count: 2, percentage: 28.57 }
-        ]
-      },
-      {
-        questionCode: '2',
-        questionText: 'How often do you recycle?',
-        choices: [
-          { choiceText: 'Never', count: 1, percentage: 14.29 },
-          { choiceText: 'Monthly', count: 1, percentage: 14.29 },
-          { choiceText: 'Weekly', count: 1, percentage: 14.29 },
-          { choiceText: 'Several times per week', count: 1, percentage: 14.29 },
-          { choiceText: 'Daily', count: 3, percentage: 42.86 }
-        ]
-      },
-      {
-        questionCode: '3',
-        questionText: 'Do you compost food waste?',
-        choices: [
-          { choiceText: 'Yes', count: 1, percentage: 14.29 },
-          { choiceText: 'No', count: 4, percentage: 57.14 },
-          { choiceText: 'Sometimes', count: 2, percentage: 28.57 }
-        ]
-      },
-      {
-        questionCode: '4',
-        questionText: 'What is your primary mode of transportation?',
-        choices: [
-          { choiceText: 'Personal Car', count: 0, percentage: 0 },
-          { choiceText: 'Public Transportation', count: 0, percentage: 0 },
-          { choiceText: 'Wlaking', count: 1, percentage: 14.29 },
-          { choiceText: 'Carpool', count: 1, percentage: 14.29 },
-          { choiceText: 'Bicycle', count: 3, percentage: 42.86 },
-          { choiceText: 'Other', count: 2, percentage: 28.57 }
-        ]
-      },
-      {
-        questionCode: '5',
-        questionText: 'How many reusable bags do you own?',
-        choices: [
-          { choiceText: '0', count: 1, percentage: 14.29 },
-          { choiceText: '1-2', count: 0, percentage: 0 },
-          { choiceText: '3-5', count: 2, percentage: 28.57 },
-          { choiceText: '6-10', count: 2, percentage: 28.57 },
-          { choiceText: 'More than 10', count: 2, percentage: 28.57 }
-        ]
-      },
-      {
-        questionCode: '6',
-        questionText: "How important is a company's environmental stance in your purchasing decisions?",
-        choices: [
-          { choiceText: 'Not Important', count: 0, percentage: 0 },
-          { choiceText: 'Somewhat Important', count: 1, percentage: 14.29 },
-          { choiceText: 'Important', count: 2, percentage: 28.57 },
-          { choiceText: 'Very Important', count: 3, percentage: 42.86 },
-          { choiceText: 'Crucial', count: 1, percentage: 14.29 }
-        ]
-      },
-      {
-        questionCode: '7',
-        questionText: 'Are you willing to pay more for environmentally friendly products?',
-        choices: [
-          { choiceText: 'Yes', count: 1, percentage: 14.29 },
-          { choiceText: 'No', count: 4, percentage: 57.14 },
-          { choiceText: 'It depends on the price difference', count: 2, percentage: 28.57 }
-        ]
-      }
-    ]
+    surveyName: '',
+    totalResponses: 0,
+    questions: []
   };
 
   showPercentage = true;
@@ -95,10 +28,84 @@ export class SurveyStatisticsComponent implements AfterViewInit {
   colourPalette: string[] = [];
   useAccessiblePalette = false;
 
-  constructor(private colourService: ColourService) {}
+  surveyId: number;
+  surveyName: string;
 
-  ngAfterViewInit(): void {
-    this.renderAllCharts();
+  constructor(
+    private surveysService: SurveysService,
+    private colourService: ColourService,
+    private titleService: Title,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.route.data.subscribe((data: { title: string }) => {
+      this.titleService.setTitle(data.title);
+    });
+
+    this.route.params.subscribe((params) => {
+      this.surveyId = +params['id'];
+      this.loadSurveyData();
+    });
+  }
+
+  private loadSurveyData(): void {
+    this.loadSurveys();
+  }
+
+  loadSurveys(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.surveysService.getSurveys().subscribe(
+      (data: any[]) => {
+        this.surveys = data;
+        if (this.surveys.length > 0) {
+          this.selectedSurveyId = this.surveys[0].id;
+          this.loadSurveyAnalytics(this.surveys[0].name);
+        } else {
+          this.isLoading = false;
+          this.errorMessage = 'No surveys available.';
+        }
+      },
+      (error) => {
+        this.isLoading = false;
+        this.errorMessage = 'Failed to load surveys. Please try again later.';
+        console.error('Error loading surveys:', error);
+      }
+    );
+  }
+
+  loadSurveyAnalytics(surveyName: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.surveysService.getSurveyAnalytics(surveyName).subscribe(
+      (data: any) => {
+        this.surveyData = data;
+        this.isLoading = false;
+        setTimeout(() => {
+          this.renderAllCharts();
+        }, 0);
+        this.route.data.subscribe((data: { title: string }) => {
+          this.titleService.setTitle(`${surveyName} - ${data.title}`);
+        });
+      },
+      (error) => {
+        this.isLoading = false;
+        this.errorMessage = 'Failed to load survey analytics. Please try again later.';
+        console.error('Error loading survey analytics:', error);
+      }
+    );
+  }
+
+  onSurveyChange(surveyId: number): void {
+    this.selectedSurveyId = surveyId;
+    const selectedSurvey = this.surveys.find((survey) => survey.id === surveyId);
+    if (selectedSurvey) {
+      this.loadSurveyAnalytics(selectedSurvey.name);
+    }
   }
 
   toggleDataType(): void {
