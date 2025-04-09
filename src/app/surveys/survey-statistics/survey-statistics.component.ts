@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import Chart from 'chart.js';
+import { ColourService } from '../services/colour-service';
 
 @Component({
   selector: 'mifosx-survey-statistics',
@@ -92,44 +93,9 @@ export class SurveyStatisticsComponent implements AfterViewInit {
   chartInstances: { [questionCode: string]: any } = {};
   chartTypes: { [questionCode: string]: string } = {};
   colourPalette: string[] = [];
+  useAccessiblePalette = false;
 
-  private readonly baseHues: number[] = [
-    0, // Red
-    120, // Green
-    240, // Blue
-    60, // Yellow
-    180, // Cyan
-    300, // Magenta
-    30, // Orange
-    150, // Lime
-    210, // Light Blue
-    330 // Pink
-
-  ];
-
-  private generateColourPalette(numberOfColours: number): string[] {
-    const palette: string[] = [];
-    const baseHueCount = this.baseHues.length;
-
-    for (let i = 0; i < numberOfColours; i++) {
-      const baseHueIndex = i % baseHueCount;
-      const baseHue = this.baseHues[baseHueIndex];
-
-      // Add slight variation to base hue for more distinct colours
-      const hueVariation = (Math.random() - 0.5) * 20;
-      const hue = (baseHue + hueVariation) % 360;
-
-      // Use high saturation for vibrant colours
-      const saturation = 85 + Math.random() * 15;
-
-      // Use medium lightness for good contrast
-      const lightness = 45 + Math.random() * 15;
-
-      palette.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
-    }
-
-    return palette;
-  }
+  constructor(private colourService: ColourService) {}
 
   ngAfterViewInit(): void {
     this.renderAllCharts();
@@ -153,10 +119,24 @@ export class SurveyStatisticsComponent implements AfterViewInit {
     }
   }
 
+  toggleAccessiblePalette(): void {
+    this.useAccessiblePalette = !this.useAccessiblePalette;
+    this.renderAllCharts();
+  }
+
   renderAllCharts(): void {
     // Generate enough colours for the largest question set
     const maxChoices = Math.max(...this.surveyData.questions.map((q: { choices: any[] }) => q.choices.length)) || 8;
-    this.colourPalette = this.generateColourPalette(maxChoices);
+
+    if (this.useAccessiblePalette) {
+      this.colourPalette = this.colourService.generateAccessiblePalette(maxChoices);
+    } else {
+      this.colourPalette = this.colourService.generateColourPalette(maxChoices, {
+        distribution: 'golden',
+        saturation: 85,
+        lightness: 55
+      });
+    }
 
     for (const question of this.surveyData.questions) {
       this.chartTypes[question.questionCode] = 'pie';
@@ -198,7 +178,7 @@ export class SurveyStatisticsComponent implements AfterViewInit {
         easing: 'easeInOutQuart'
       },
       legend: {
-        display: chartType === 'pie',
+        display: true,
         position: 'top',
         align: 'center',
         labels: {
