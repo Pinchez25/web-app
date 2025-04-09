@@ -332,3 +332,31 @@ $transition: all 0.3s ease;
     break-inside: avoid;
   }
 }
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  min-height: 300px;
+}
+
+.loading-container p,
+.error-container p {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.error-container {
+  color: #f44336;
+}
+
+.error-container mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
