@@ -2591,7 +2591,8 @@
       "Redeem Shares": "Redeem Shares",
       "Approve Additional Shares": "Approve Additional Shares",
       "Reject Additional Shares": "Reject Additional Shares",
-      "XBRL": "XBRL"
+      "XBRL": "XBRL",
+      "SurveyStats": "Survey Statistics"
     },
     "placeholders": {
       "Add new server": "Add new server",
@@ -3588,6 +3589,7 @@
     "Yes": "Yes",
     "loan product will be active and available to clients": "The date that the loan product will be active and available to clients. If blank, the loan product will be active as soon as it is created.",
     "loan product will become inactive and unavailable to clients": "The date that the loan product will become inactive and unavailable to clients. If blank, the load product will never become inactive.",
-    "Refund transactions where interest refund will automatically be calculated": "Refund transactions where interest refund will automatically be calculated"
+    "Refund transactions where interest refund will automatically be calculated": "Refund transactions where interest refund will automatically be calculated",
+    "SurveyStats": "Survey Statistics"
   }
 }

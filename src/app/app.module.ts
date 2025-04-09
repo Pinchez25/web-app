@@ -35,6 +35,7 @@ import { ProfileModule } from './profile/profile.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ConfigurationWizardModule } from './configuration-wizard/configuration-wizard.module';
 import { PortalModule } from '@angular/cdk/portal';
+import { SurveysModule } from './surveys/surveys.module';
 
 /** Main Routing Module */
 import { AppRoutingModule } from './app-routing.module';
@@ -105,6 +106,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CollectionsModule,
     TasksModule,
     ConfigurationWizardModule,
+    SurveysModule,
     AppRoutingModule
 
   ],
