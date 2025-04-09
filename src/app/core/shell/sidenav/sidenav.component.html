@@ -119,6 +119,18 @@
           <a matLine>{{ 'labels.menus.Notifications' | translate }}</a>
         </mat-list-item>
         <mat-list-item
+          [routerLink]="['/surveys/statistics']"
+          [matTooltipPosition]="tooltipPosition"
+          matTooltip="{{ 'tooltips.SurveyStats' | translate }}"
+          routerLinkActive="active-menu"
+          [routerLinkActiveOptions]="{ exact: false }"
+        >
+          <mat-icon matListIcon>
+            <fa-icon icon="chart-bar" size="sm"></fa-icon>
+          </mat-icon>
+          <a matLine>{{ 'labels.menus.SurveyStats' | translate }}</a>
+        </mat-list-item>
+        <mat-list-item
           [routerLink]="['/accounting/journal-entries/frequent-postings']"
           [matTooltipPosition]="tooltipPosition"
           matTooltip="{{ 'tooltips.Frequent Postings' | translate }}"
