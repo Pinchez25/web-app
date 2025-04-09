@@ -1,66 +1,79 @@
 <div class="container">
-  <!-- Survey Selector Component -->
-  <div class="survey-selector">
-    <label for="survey-select">Select Survey:</label>
-    <select id="survey-select" class="survey-select-dropdown">
-      <option value="survey1">Employee Satisfaction Survey 2025</option>
-      <option value="survey2">Customer Feedback Q1 2025</option>
-      <option value="survey3">Product Usability Study</option>
-      <option value="survey4">Market Research Survey</option>
-    </select>
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading survey data...</p>
   </div>
 
-  <div class="header">
-    <h1>{{ surveyData.surveyName }}</h1>
-    <div class="survey-info">Total Responses: {{ surveyData.totalResponses }}</div>
-    <div class="controls">
-      <button mat-raised-button color="primary" (click)="toggleDataType()">
-        Show {{ showPercentage ? 'Counts' : 'Percentages' }}
-      </button>
-      <button mat-raised-button color="primary" (click)="toggleAllCharts()">Toggle All Charts</button>
-      <button mat-raised-button color="accent" (click)="toggleAccessiblePalette()">
-        {{ useAccessiblePalette ? 'Use Standard Palette' : 'Use Accessible Palette' }}
-      </button>
+  <div *ngIf="!isLoading && errorMessage" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage">
+    <div class="survey-selector">
+      <label for="survey-select">Select Survey:</label>
+      <select id="survey-select" class="survey-select-dropdown" (change)="onSurveyChange(+$event.target.value)">
+        <option *ngFor="let survey of surveys" [value]="survey.id" [selected]="survey.id === selectedSurveyId">
+          {{ survey.name }}
+        </option>
+      </select>
     </div>
-  </div>
 
-  <div class="questions-container">
-    <div *ngFor="let question of surveyData.questions" class="question-card">
-      <div class="question-header">
-        <h2 class="question-title">{{ question.questionCode }}. {{ question.questionText }}</h2>
-        <button
-          mat-raised-button
-          color="primary"
-          class="toggle-chart-button"
-          (click)="toggleChartType(question.questionCode)"
-        >
-          Switch to {{ chartInstances[question.questionCode]?.config?.type === 'pie' ? 'Bar' : 'Pie' }} Chart
+    <div class="header">
+      <h1>{{ surveyData.surveyName }}</h1>
+      <div class="survey-info">Total Responses: {{ surveyData.totalResponses }}</div>
+      <div class="controls">
+        <button mat-raised-button color="primary" (click)="toggleDataType()">
+          Show {{ showPercentage ? 'Counts' : 'Percentages' }}
+        </button>
+        <button mat-raised-button color="primary" (click)="toggleAllCharts()">Toggle All Charts</button>
+        <button mat-raised-button color="accent" (click)="toggleAccessiblePalette()">
+          {{ useAccessiblePalette ? 'Use Standard Palette' : 'Use Accessible Palette' }}
         </button>
       </div>
+    </div>
 
-      <div class="chart-and-table">
-        <div class="chart-container">
-          <canvas [id]="'chart-' + question.questionCode" width="400" height="300"></canvas>
+    <div class="questions-container">
+      <div *ngFor="let question of surveyData.questions" class="question-card">
+        <div class="question-header">
+          <h2 class="question-title">{{ question.questionCode }}. {{ question.questionText }}</h2>
+          <button
+            mat-raised-button
+            color="primary"
+            class="toggle-chart-button"
+            (click)="toggleChartType(question.questionCode)"
+          >
+            Switch to {{ chartInstances[question.questionCode]?.config?.type === 'pie' ? 'Bar' : 'Pie' }} Chart
+          </button>
         </div>
 
-        <div class="table-container">
-          <table mat-table [dataSource]="question.choices">
-            <ng-container matColumnDef="choice">
-              <th mat-header-cell *matHeaderCellDef>Choice</th>
-              <td mat-cell *matCellDef="let choice; let i = index">
-                <span class="color-indicator" [style.background-color]="colourPalette[i % colourPalette.length]"></span>
-                {{ choice.choiceText }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="value">
-              <th mat-header-cell *matHeaderCellDef>{{ showPercentage ? 'Percentage' : 'Count' }}</th>
-              <td mat-cell *matCellDef="let choice">
-                {{ showPercentage ? (choice.percentage | number: '1.1-1') + '%' : choice.count }}
-              </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="['choice', 'value']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['choice', 'value']"></tr>
-          </table>
+        <div class="chart-and-table">
+          <div class="chart-container">
+            <canvas [id]="'chart-' + question.questionCode" width="400" height="300"></canvas>
+          </div>
+
+          <div class="table-container">
+            <table mat-table [dataSource]="question.choices">
+              <ng-container matColumnDef="choice">
+                <th mat-header-cell *matHeaderCellDef>Choice</th>
+                <td mat-cell *matCellDef="let choice; let i = index">
+                  <span
+                    class="color-indicator"
+                    [style.background-color]="colourPalette[i % colourPalette.length]"
+                  ></span>
+                  {{ choice.choiceText }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>{{ showPercentage ? 'Percentage' : 'Count' }}</th>
+                <td mat-cell *matCellDef="let choice">
+                  {{ showPercentage ? (choice.percentage | number: '1.1-1') + '%' : choice.count }}
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['choice', 'value']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['choice', 'value']"></tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
