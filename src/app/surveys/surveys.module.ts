@@ -4,7 +4,7 @@ import { SurveyStatisticsComponent } from './survey-statistics/survey-statistics
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { Route } from '../core/route/route.service';
-import { ColourPaletteGeneratorService } from './services/colour-palette-generator.service';
+import { ColourService } from './services/colour-service';
 
 const routes: Routes = [
   Route.withShell([
@@ -32,7 +32,7 @@ const routes: Routes = [
     SharedModule,
     RouterModule.forChild(routes)],
   providers: [
-    ColourPaletteGeneratorService
+    ColourService
   ]
 })
 export class SurveysModule {}
